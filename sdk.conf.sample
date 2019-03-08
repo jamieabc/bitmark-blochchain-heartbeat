@@ -1,0 +1,24 @@
+-- heartbeat conf
+
+local M = {}
+
+-- time period to spend tokens, valid arguments: month, week, day, hour
+M.cycle_period = "week"
+
+-- crypto used to estimate, valid arguments: ltc
+M.crypto = "ltc"
+
+-- how much LTC to spend in the cycle
+M.SpendingPerCycle = 0.01
+
+-- network, valid arguments: bitmark, testnet
+M.chain = "testnet"
+
+-- sdk api token
+M.sdk_api_token = ""
+
+-- account recovery phrases
+-- M.recovery_phrases = {
+-- }
+
+return M
