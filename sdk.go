@@ -8,6 +8,7 @@ import (
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
 	"github.com/bitmark-inc/bitmark-sdk-go/account"
 	"github.com/bitmark-inc/bitmark-sdk-go/asset"
+	"github.com/bitmark-inc/bitmark-sdk-go/bitmark"
 	"github.com/bxcodec/faker/v3"
 	"golang.org/x/text/language"
 )
@@ -59,4 +60,13 @@ func registerAsset(owner account.Account) (string, error) {
 	}
 
 	return asset.Register(params)
+}
+
+func issueAsset(issuer account.Account, assetID string) ([]string, error) {
+	params := bitmark.NewIssuanceParams(
+		assetID,
+		1,
+	)
+	params.Sign(issuer)
+	return bitmark.Issue(params)
 }

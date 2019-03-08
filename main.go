@@ -16,8 +16,18 @@ func main() {
 	sdk.Init(newSdkConfig(config))
 	account, err := restoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
 	if nil != err {
-		fmt.Printf("%s", err.Error())
+		fmt.Printf("restore accoutn error: %s", err.Error())
 		return
 	}
-	fmt.Printf("account: %v", account)
+	assetID, err := registerAsset(account)
+	if nil != err {
+		fmt.Printf("register asset error: %s", err)
+		return
+	}
+	bitmarkIDs, err := issueAsset(account, assetID)
+	if nil != err {
+		fmt.Printf("issue asset error: %s", err)
+		return
+	}
+	fmt.Printf("assetID: %s, bitmarkIDs: %v\n", assetID, bitmarkIDs)
 }
