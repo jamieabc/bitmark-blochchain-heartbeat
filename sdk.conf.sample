@@ -11,6 +11,10 @@ M.crypto = "ltc"
 -- how much LTC to spend in the cycle
 M.spending_per_cycle = 0.01
 
+-- spending cost base on crypto
+M.issue_cost = 0.001
+M.transfer_cost = 0.002
+
 -- network, valid arguments: bitmark, testnet
 M.chain = "testnet"
 
