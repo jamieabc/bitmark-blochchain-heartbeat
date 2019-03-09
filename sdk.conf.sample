@@ -9,7 +9,7 @@ M.cycle_period = "week"
 M.crypto = "ltc"
 
 -- how much LTC to spend in the cycle
-M.SpendingPerCycle = 0.01
+M.spending_per_cycle = 0.01
 
 -- network, valid arguments: bitmark, testnet
 M.chain = "testnet"
