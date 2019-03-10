@@ -11,7 +11,7 @@ func runBackground(interval time.Duration, accounts []account.Account) {
 		for {
 			select {
 			case <-time.After(interval):
-				createIssuanceFromRandomAccounts(accounts)
+				createIssuanceFromAccountsRandomly(accounts)
 			}
 		}
 	}(interval)

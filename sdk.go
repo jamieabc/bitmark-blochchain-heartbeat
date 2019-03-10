@@ -78,7 +78,7 @@ func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 	return bitmark.Issue(params)
 }
 
-func createIssuanceFromRandomAccounts(accounts []account.Account) error {
+func createIssuanceFromAccountsRandomly(accounts []account.Account) error {
 	issuer := randomPickUser(accounts)
 	fmt.Printf("%v: %s create issuance\n",
 		issuer.AccountNumber(), time.Now())
