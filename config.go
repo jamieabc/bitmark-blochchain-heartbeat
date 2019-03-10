@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
 	"github.com/yuin/gluamapper"
@@ -30,7 +31,9 @@ type Config struct {
 	TransferCost     float64     `gluamapper:"transfer_cost" json:"transfer_cost"`
 	Chain            sdk.Network `gluamapper:"chain" json:"chain"`
 	SDKApiToken      string      `gluamapper:"sdk_api_token" json:"sdk_api_token"`
-	RecoveryPhrases  []string    `gluamapper:"recovery_phrases" json:"recovery_phrases"`
+	// FirstRecoveryPhrases  []string    `gluamapper:"first_recovery_phrases" json:"first_recovery_phrases"`
+	// SecondRecoveryPhrases []string    `gluamapper:"second_recovery_phrases" json:"second_recovery_phrases"`
+	RecoveryPhrases []string `gluamapper:"recovery_phrases" json:"recovery_phrases"`
 }
 
 func newConfig() (*Config, error) {
@@ -76,8 +79,10 @@ func (c *Config) valid() bool {
 		!contains(chain, string(c.Chain)) {
 		return false
 	}
-	if len(c.RecoveryPhrases) != recoveryPhrasesLength {
-		return false
+	for _, s := range c.RecoveryPhrases {
+		if len(strings.Split(s, ",")) != recoveryPhrasesLength {
+			return false
+		}
 	}
 	return true
 }

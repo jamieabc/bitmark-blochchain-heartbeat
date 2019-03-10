@@ -2,8 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
+)
+
+const (
+	minActionInterval = time.Duration(5) * time.Second
 )
 
 func main() {
@@ -14,20 +22,23 @@ func main() {
 	}
 
 	sdk.Init(newSdkConfig(config))
-	account, err := restoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
+
+	accounts, err := restoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
 	if nil != err {
 		fmt.Printf("restore accoutn error: %s", err.Error())
 		return
 	}
-	assetID, err := registerAsset(account)
-	if nil != err {
-		fmt.Printf("register asset error: %s", err)
-		return
-	}
-	bitmarkIDs, err := issueAsset(account, assetID)
-	if nil != err {
-		fmt.Printf("issue asset error: %s", err)
-		return
-	}
-	fmt.Printf("assetID: %s, bitmarkIDs: %v\n", assetID, bitmarkIDs)
+
+	fmt.Println("Start heartbeat...")
+
+	fp := newFinancePlanner(config, minActionInterval)
+	actionInterval := fp.actionInterval()
+	fmt.Printf("action duration: %v\n", actionInterval)
+	runBackground(actionInterval, accounts)
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-ch
+	fmt.Printf("received signal: %v\n", sig)
+	fmt.Println("Terminating...")
 }

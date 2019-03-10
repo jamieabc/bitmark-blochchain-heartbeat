@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
@@ -30,12 +32,17 @@ func newSdkConfig(config *Config) *sdk.Config {
 	return sdkConfig
 }
 
-func restoreAccountFromRecoveryPhrase(strs []string) (account.Account, error) {
-	account, err := account.FromRecoveryPhrase(strs, language.AmericanEnglish)
-	if nil != err {
-		return nil, fmt.Errorf("error recovery account from phrase: %s", err)
+func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) {
+	var accounts []account.Account
+	for _, s := range strs {
+		phrases := strings.Split(s, ",")
+		account, err := account.FromRecoveryPhrase(phrases, language.AmericanEnglish)
+		if nil != err {
+			return accounts, fmt.Errorf("error recovery account from phrase: %s", err)
+		}
+		accounts = append(accounts, account)
 	}
-	return account, nil
+	return accounts, nil
 }
 
 func registerAsset(owner account.Account) (string, error) {
@@ -69,4 +76,32 @@ func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 	)
 	params.Sign(issuer)
 	return bitmark.Issue(params)
+}
+
+func createIssuanceFromRandomAccounts(accounts []account.Account) error {
+	issuer := randomPickUser(accounts)
+	fmt.Printf("%v: %s create issuance\n",
+		issuer.AccountNumber(), time.Now())
+	assetID, err := registerAsset(issuer)
+	if nil != err {
+		fmt.Printf("register asset error: %s", err)
+		return err
+	}
+	fmt.Printf("assetID: %s\n", assetID)
+
+	bitmarkIDs, err := issueAsset(issuer, assetID)
+	if nil != err {
+		fmt.Printf("issue asset error: %s", err)
+		return nil
+	}
+	fmt.Printf("bitmark IDs: %v\n\n", bitmarkIDs)
+	return nil
+}
+
+func randomPickUser(accounts []account.Account) account.Account {
+	if 1 == len(accounts) {
+		return accounts[0]
+	}
+	randomIndex := rand.Intn(len(accounts))
+	return accounts[randomIndex]
 }

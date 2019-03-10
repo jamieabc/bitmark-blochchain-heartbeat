@@ -9,6 +9,8 @@ M.cycle_period = "week"
 M.crypto = "ltc"
 
 -- how much LTC to spend in the cycle
+-- to have issuance / 10 minutes, cost a week is 1.008 LTC
+-- to have transfer / 10 minutes, cost a week is 2.016 LTC
 M.spending_per_cycle = 0.01
 
 -- spending cost base on crypto
