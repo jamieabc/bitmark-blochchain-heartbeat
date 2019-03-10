@@ -32,11 +32,20 @@ func newSdkConfig(config *Config) *sdk.Config {
 	return sdkConfig
 }
 
+func arrayMap(strs []string, f func(string, string) string) []string {
+	newStrs := make([]string, len(strs))
+	for i, s := range strs {
+		newStrs[i] = f(s, " ")
+	}
+	return newStrs
+}
+
 func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) {
 	var accounts []account.Account
 	for _, s := range strs {
 		phrases := strings.Split(s, ",")
-		account, err := account.FromRecoveryPhrase(phrases, language.AmericanEnglish)
+		trimesPhrases := arrayMap(phrases, strings.Trim)
+		account, err := account.FromRecoveryPhrase(trimesPhrases, language.AmericanEnglish)
 		if nil != err {
 			return accounts, fmt.Errorf("error recovery account from phrase: %s", err)
 		}
