@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	networkTimeout = 10 * time.Second
-	fingerprint    = "heartbeat@bitmark"
+	networkTimeout        = 10 * time.Second
+	issuerName            = "heartbeat"
 )
 
 func newSdkConfig(config *Config) *sdk.Config {
@@ -55,16 +55,16 @@ func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) 
 }
 
 func registerAsset(owner account.Account) (string, error) {
-	name := "heartbeat"
+	name := issuerName
 	params, err := asset.NewRegistrationParams(
 		name,
-		map[string]string{"owner": name},
+		map[string]string{"owner": name, "issueTime": time.Now().String()},
 	)
 	if nil != err {
 		return "", err
 	}
 
-	err = params.SetFingerprint([]byte(fingerprint))
+	err = params.SetFingerprint([]byte(time.Now().String()))
 	if nil != err {
 		return "", err
 	}
