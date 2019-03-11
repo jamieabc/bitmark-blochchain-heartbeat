@@ -11,12 +11,12 @@ import (
 	"github.com/bitmark-inc/bitmark-sdk-go/account"
 	"github.com/bitmark-inc/bitmark-sdk-go/asset"
 	"github.com/bitmark-inc/bitmark-sdk-go/bitmark"
-	"github.com/bxcodec/faker/v3"
 	"golang.org/x/text/language"
 )
 
 const (
 	networkTimeout = 10 * time.Second
+	fingerprint    = "heartbeat@bitmark"
 )
 
 func newSdkConfig(config *Config) *sdk.Config {
@@ -55,7 +55,7 @@ func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) 
 }
 
 func registerAsset(owner account.Account) (string, error) {
-	name := faker.Username()
+	name := "heartbeat"
 	params, err := asset.NewRegistrationParams(
 		name,
 		map[string]string{"owner": name},
@@ -64,8 +64,7 @@ func registerAsset(owner account.Account) (string, error) {
 		return "", err
 	}
 
-	fakeData := faker.Email()
-	err = params.SetFingerprint([]byte(fakeData))
+	err = params.SetFingerprint([]byte(fingerprint))
 	if nil != err {
 		return "", err
 	}
@@ -90,7 +89,7 @@ func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 func createIssuanceFromAccountsRandomly(accounts []account.Account) error {
 	issuer := randomPickUser(accounts)
 	fmt.Printf("%v: %s create issuance\n",
-		issuer.AccountNumber(), time.Now())
+		time.Now(), issuer.AccountNumber())
 	assetID, err := registerAsset(issuer)
 	if nil != err {
 		fmt.Printf("register asset error: %s", err)
