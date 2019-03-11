@@ -17,6 +17,7 @@ import (
 const (
 	networkTimeout        = 10 * time.Second
 	issuerName            = "heartbeat"
+	issuanceForBlockMiner = 2
 )
 
 func newSdkConfig(config *Config) *sdk.Config {
@@ -80,7 +81,7 @@ func registerAsset(owner account.Account) (string, error) {
 func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 	params := bitmark.NewIssuanceParams(
 		assetID,
-		1,
+		issuanceForBlockMiner,
 	)
 	params.Sign(issuer)
 	return bitmark.Issue(params)
