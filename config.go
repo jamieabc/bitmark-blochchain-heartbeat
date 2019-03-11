@@ -20,7 +20,7 @@ const (
 var (
 	cyclePeriod = []string{"hour", "day", "week", "month"}
 	crypto      = []string{"ltc"}
-	chain       = []string{"bitmark", "testnet"}
+	chain       = []string{"livenet", "testnet"}
 )
 
 type Config struct {
