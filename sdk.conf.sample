@@ -23,8 +23,11 @@ M.chain = "testnet"
 -- sdk api token
 M.sdk_api_token = ""
 
--- account recovery phrases
+-- account recovery phrases, support multiple accounts
+-- all recovery phrases each combined with comma in a double quote, last one without comman
 -- M.recovery_phrases = {
+-- "first,second,third,forth,fifth,sixth,seventh,eighth,ninenth,tenth,eleventh,twelveth",
+-- "aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll"
 -- }
 
 return M
