@@ -11,12 +11,12 @@ import (
 	"github.com/bitmark-inc/bitmark-sdk-go/account"
 	"github.com/bitmark-inc/bitmark-sdk-go/asset"
 	"github.com/bitmark-inc/bitmark-sdk-go/bitmark"
+	"github.com/bxcodec/faker/v3"
 	"golang.org/x/text/language"
 )
 
 const (
 	networkTimeout        = 10 * time.Second
-	issuerName            = "heartbeat"
 	issuanceForBlockMiner = 2
 )
 
@@ -56,10 +56,18 @@ func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) 
 }
 
 func registerAsset(owner account.Account) (string, error) {
-	name := issuerName
+	name := books[rand.Intn(len(books))]
 	params, err := asset.NewRegistrationParams(
 		name,
-		map[string]string{"owner": name, "issueTime": time.Now().String()},
+		map[string]string{
+			"owner":     faker.Name(),
+			"issueTime": time.Now().String(),
+			"author":    faker.Name(),
+			"date":      faker.Date(),
+			"email":     faker.Email(),
+			"favorite":  faker.Sentence(),
+			"phone":     faker.E164PhoneNumber(),
+		},
 	)
 	if nil != err {
 		return "", err
