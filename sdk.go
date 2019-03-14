@@ -20,6 +20,33 @@ const (
 	issuanceForBlockMiner = 2
 )
 
+type TransitionVerbs struct {
+	verb string
+	adv  string
+}
+
+var (
+	verbs = []TransitionVerbs{
+		{"send", "to"},
+		{"receive", "from"},
+		{"buy", "from"},
+		{"sell", "to"},
+		{"transfer", "to"},
+		{"register", ""},
+		{"claim", ""},
+		{"give", "to"},
+	}
+)
+
+func meaningfulName(item string) string {
+	transitionVerb := verbs[rand.Intn(len(verbs))]
+	if "" != transitionVerb.adv {
+		return fmt.Sprintf("%s %s %s %s", transitionVerb.verb, item,
+			transitionVerb.adv, faker.Name())
+	}
+	return fmt.Sprintf("%s %s", transitionVerb.verb, item)
+}
+
 func newSdkConfig(config *Config) *sdk.Config {
 	httpClient := &http.Client{
 		Timeout: networkTimeout,
@@ -56,9 +83,9 @@ func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) 
 }
 
 func registerAsset(owner account.Account) (string, error) {
-	name := books[rand.Intn(len(books))]
+	title := meaningfulName(books[rand.Intn(len(books))])
 	params, err := asset.NewRegistrationParams(
-		name,
+		title,
 		map[string]string{
 			"owner":     faker.Name(),
 			"issueTime": time.Now().String(),
