@@ -97,9 +97,8 @@ func registerAsset(owner account.Account) (string, error) {
 			"issueTime": time.Now().String(),
 			"author":    faker.Name(),
 			"date":      faker.Date(),
-			"email":     faker.Email(),
 			"favorite":  faker.Sentence(),
-			"phone":     faker.E164PhoneNumber(),
+			"sig":       faker.Password(),
 		},
 	)
 	if nil != err {
