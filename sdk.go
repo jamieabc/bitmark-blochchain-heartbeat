@@ -18,7 +18,7 @@ import (
 const (
 	networkTimeout        = 10 * time.Second
 	issuanceForBlockMiner = 2
-	maximumIssuanceName   = 64
+	maximumIssuanceName   = 50
 )
 
 type TransitionVerbs struct {

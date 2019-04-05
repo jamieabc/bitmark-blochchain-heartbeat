@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	maximumNameLength = 64
+	maximumNameLength = 50
 )
 
 var (
