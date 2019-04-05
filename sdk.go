@@ -18,6 +18,7 @@ import (
 const (
 	networkTimeout        = 10 * time.Second
 	issuanceForBlockMiner = 2
+	maximumIssuanceName   = 64
 )
 
 type TransitionVerbs struct {
@@ -44,13 +45,21 @@ var (
 	}
 )
 
+func truncateLongString(str string) string {
+	if len(str) >= maximumIssuanceName {
+		return str[0:maximumIssuanceName]
+	}
+	return str
+}
+
 func meaningfulName(item string) string {
+	str := truncateLongString(item)
 	transitionVerb := verbs[rand.Intn(len(verbs))]
 	if "" != transitionVerb.adv {
-		return fmt.Sprintf("%s %s %s %s", transitionVerb.verb, item,
+		return fmt.Sprintf("%s %s %s %s", transitionVerb.verb, str,
 			transitionVerb.adv, faker.Name())
 	}
-	return fmt.Sprintf("%s %s", transitionVerb.verb, item)
+	return fmt.Sprintf("%s %s", transitionVerb.verb, str)
 }
 
 func newSdkConfig(config *Config) *sdk.Config {
