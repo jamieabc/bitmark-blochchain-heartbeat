@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-const (
-	maximumNameLength = 50
-)
-
 var (
 	letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
@@ -22,13 +18,13 @@ func randomString(length int) string {
 }
 
 func TestTruncateLongString(t *testing.T) {
-	longStr := randomString(2 * maximumNameLength)
-	shortStr := randomString(maximumNameLength - 1)
+	longStr := randomString(2 * maximumItemName)
+	shortStr := randomString(maximumItemName - 1)
 	fixture := []struct {
 		str      string
 		expected string
 	}{
-		{longStr, longStr[0:maximumNameLength]},
+		{longStr, longStr[0:maximumItemName]},
 		{shortStr, shortStr},
 	}
 

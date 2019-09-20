@@ -7,13 +7,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
+
+	"github.com/bitmark-inc/logger"
 
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
-)
-
-const (
-	minActionInterval = time.Duration(5) * time.Second
 )
 
 var books []string
@@ -42,6 +39,12 @@ func main() {
 		return
 	}
 
+	err = logger.Initialise(config.Logging)
+	if nil != err {
+		fmt.Printf("initialise logger with error: %s\n", err)
+		return
+	}
+
 	sdk.Init(newSdkConfig(config))
 
 	accounts, err := restoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
@@ -52,14 +55,21 @@ func main() {
 
 	fmt.Println("Start heartbeat...")
 
-	fp := newFinancePlanner(config, minActionInterval)
-	actionInterval := fp.actionInterval()
-	fmt.Printf("action duration: %v\n", actionInterval)
-	runBackground(actionInterval, accounts)
+	fp := newFinancePlanner(config)
+	duration := fp.actionDuration()
+	fmt.Printf("action duration: %v\n", duration)
+	shutdownChan := make(chan struct{})
+	doPeriodicTasks(taskInfo{
+		duration:     duration,
+		accounts:     accounts,
+		shutdownChan: shutdownChan,
+		config:       config,
+	})
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-ch
+	shutdownChan <- struct{}{}
 	fmt.Printf("received signal: %v\n", sig)
 	fmt.Println("Terminating...")
 }

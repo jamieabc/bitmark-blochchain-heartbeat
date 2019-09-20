@@ -54,8 +54,8 @@ func TestActionInterval(t *testing.T) {
 	}
 
 	for _, s := range fixture {
-		p := newFinancePlanner(s.config, minDuration)
-		actual := p.actionInterval()
+		p := newFinancePlanner(s.config)
+		actual := p.actionDuration()
 		if actual != s.expected {
 			t.Errorf("error get action interval, expect %d but get %d",
 				s.expected, actual)

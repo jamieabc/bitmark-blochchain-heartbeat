@@ -4,13 +4,13 @@ go 1.12
 
 require (
 	github.com/bitmark-inc/bitmark-sdk-go v0.0.0-20181009083816-6831c57
-	github.com/bitmark-inc/bitmarkd v0.10.2 // indirect
+	github.com/bitmark-inc/bitmarkd v0.11.5
+	github.com/bitmark-inc/logger v0.3.4
 	github.com/bxcodec/faker/v3 v3.0.0
-	github.com/google/pprof v0.0.0-20190228041337-2ef8d84b2e3c // indirect
-	github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6 // indirect
+	github.com/golang/mock v1.3.1
+	github.com/jamieabc/bitmarkd-broadcast-monitor v0.0.0-20190918091508-176e0955c7e9
+	github.com/stretchr/testify v1.4.0
 	github.com/yuin/gluamapper v0.0.0-20150323120927-d836955830e7
-	github.com/yuin/gopher-lua v0.0.0-20190206043414-8bfc7677f583
-	golang.org/x/arch v0.0.0-20190226203302-36aee92af9e8 // indirect
-	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25 // indirect
-	golang.org/x/text v0.3.0
+	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036
+	golang.org/x/text v0.3.2
 )

@@ -4,6 +4,10 @@ import (
 	"time"
 )
 
+const (
+	minActionInterval = time.Hour
+)
+
 type FinancePlanner struct {
 	period              time.Duration
 	spendingPerCycle    float64
@@ -11,17 +15,17 @@ type FinancePlanner struct {
 	minDurationInterval time.Duration
 }
 
-func newFinancePlanner(c *Config, minDuration time.Duration) *FinancePlanner {
+func newFinancePlanner(c *Config) *FinancePlanner {
 	planner := &FinancePlanner{
 		period:              convertPeriod2Duration(c.CyclePeriod),
 		spendingPerCycle:    c.SpendingPerCycle,
 		costPerAction:       c.IssueCost,
-		minDurationInterval: minDuration,
+		minDurationInterval: minActionInterval,
 	}
 	return planner
 }
 
-func (p *FinancePlanner) actionInterval() time.Duration {
+func (p *FinancePlanner) actionDuration() time.Duration {
 	actionCount := p.spendingPerCycle / p.costPerAction
 	duration := time.Duration(float64(p.period)/actionCount) * time.Nanosecond
 	if duration < p.minDurationInterval {

@@ -30,4 +30,31 @@ M.sdk_api_token = ""
 -- "aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll"
 -- }
 
+M.logging = {
+    size = 1048576,
+    count = 100,
+    directory = "log",
+    file = "heartbeat.log",
+
+    console = false,
+
+    levels = {
+        DEFAULT = "debug",
+    }
+}
+
+M.node = {
+  ip = "1.2.3.4",
+  broadcast_port = "2135",
+  command_port = "2136",
+  public_key = "public_key",
+  chain = "testing",
+  name = "node",
+}
+
+M.keys = {
+  public = "PUBLIC:public_key",
+  private = "PRIVATE:private_key",
+}
+
 return M

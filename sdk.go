@@ -18,7 +18,7 @@ import (
 const (
 	networkTimeout        = 10 * time.Second
 	issuanceForBlockMiner = 2
-	maximumIssuanceName   = 50
+	maximumItemName       = 64
 )
 
 type TransitionVerbs struct {
@@ -46,8 +46,8 @@ var (
 )
 
 func truncateLongString(str string) string {
-	if len(str) >= maximumIssuanceName {
-		return str[0:maximumIssuanceName]
+	if len(str) >= maximumItemName {
+		return str[0:maximumItemName]
 	}
 	return str
 }
@@ -87,12 +87,12 @@ func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) 
 	var accounts []account.Account
 	for _, s := range strs {
 		phrases := strings.Split(s, ",")
-		trimesPhrases := arrayMap(phrases, strings.Trim)
-		account, err := account.FromRecoveryPhrase(trimesPhrases, language.AmericanEnglish)
+		trimedPhrases := arrayMap(phrases, strings.Trim)
+		acc, err := account.FromRecoveryPhrase(trimedPhrases, language.AmericanEnglish)
 		if nil != err {
-			return accounts, fmt.Errorf("error recovery account from phrase: %s", err)
+			return accounts, fmt.Errorf("error recovery acc from phrase: %s", err)
 		}
-		accounts = append(accounts, account)
+		accounts = append(accounts, acc)
 	}
 	return accounts, nil
 }
@@ -132,7 +132,10 @@ func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 		assetID,
 		issuanceForBlockMiner,
 	)
-	params.Sign(issuer)
+	err := params.Sign(issuer)
+	if nil != err {
+		return []string{}, err
+	}
 	return bitmark.Issue(params)
 }
 

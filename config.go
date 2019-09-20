@@ -5,7 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bitmark-inc/logger"
+
 	sdk "github.com/bitmark-inc/bitmark-sdk-go"
+	"github.com/jamieabc/bitmarkd-broadcast-monitor/configuration"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -18,22 +21,33 @@ const (
 )
 
 var (
-	cyclePeriod = []string{"hour", "day", "week", "month"}
-	crypto      = []string{"ltc"}
-	chain       = []string{"livenet", "testnet"}
+	cyclePeriod    = []string{"hour", "day", "week", "month"}
+	crypto         = []string{"ltc"}
+	chain          = []string{"livenet", "testnet"}
+	defaultLogging = logger.Configuration{
+		Count:     100,
+		Console:   false,
+		Directory: "log",
+		File:      "heartbeat.log",
+		Levels: map[string]string{
+			logger.DefaultTag: "error",
+		},
+		Size: 1048576,
+	}
 )
 
 type Config struct {
-	CyclePeriod      string      `gluamapper:"cycle_period" json:"cycle_period"`
-	Crypto           string      `gluamapper:"crypto" json:"crypto"`
-	SpendingPerCycle float64     `gluamapper:"spending_per_cycle" json:"spending_per_cycle"`
-	IssueCost        float64     `gluamapper:"issue_cost" json:"issue_cost"`
-	TransferCost     float64     `gluamapper:"transfer_cost" json:"transfer_cost"`
-	Chain            sdk.Network `gluamapper:"chain" json:"chain"`
-	SDKApiToken      string      `gluamapper:"sdk_api_token" json:"sdk_api_token"`
-	// FirstRecoveryPhrases  []string    `gluamapper:"first_recovery_phrases" json:"first_recovery_phrases"`
-	// SecondRecoveryPhrases []string    `gluamapper:"second_recovery_phrases" json:"second_recovery_phrases"`
-	RecoveryPhrases []string `gluamapper:"recovery_phrases" json:"recovery_phrases"`
+	CyclePeriod      string                   `gluamapper:"cycle_period" json:"cycle_period"`
+	Crypto           string                   `gluamapper:"crypto" json:"crypto"`
+	SpendingPerCycle float64                  `gluamapper:"spending_per_cycle" json:"spending_per_cycle"`
+	IssueCost        float64                  `gluamapper:"issue_cost" json:"issue_cost"`
+	TransferCost     float64                  `gluamapper:"transfer_cost" json:"transfer_cost"`
+	Chain            sdk.Network              `gluamapper:"chain" json:"chain"`
+	SDKApiToken      string                   `gluamapper:"sdk_api_token" json:"sdk_api_token"`
+	RecoveryPhrases  []string                 `gluamapper:"recovery_phrases" json:"recovery_phrases"`
+	NodeConfig       configuration.NodeConfig `gluamapper:"node" json:"node"`
+	Keys             configuration.Keys       `gluamapper:"keys"`
+	Logging          logger.Configuration     `gluamapper:"logging"`
 }
 
 func newConfig() (*Config, error) {
@@ -50,6 +64,7 @@ func newConfig() (*Config, error) {
 		TransferCost:     defaultTransferCost,
 		Chain:            "testing",
 		SDKApiToken:      "",
+		Logging:          defaultLogging,
 	}
 
 	err = config.parse(path)
