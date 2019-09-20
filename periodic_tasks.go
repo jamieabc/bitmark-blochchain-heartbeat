@@ -64,6 +64,10 @@ func updateTimer(timer *time.Timer, remote node.Remote, targetDuration time.Dura
 		timer.Reset(time.Hour)
 		return
 	}
+
+	// add a one minute buffer to avoid some check is not consistent for 1 hour
+	durationToNextCheck = durationToNextCheck + time.Minute
+
 	fmt.Printf("duration to next check: %s\n", durationToNextCheck)
-	timer.Reset(durationToNextCheck + time.Minute)
+	timer.Reset(durationToNextCheck)
 }
