@@ -16,9 +16,10 @@ import (
 )
 
 const (
-	networkTimeout        = 10 * time.Second
-	issuanceForBlockMiner = 2
-	maximumItemName       = 64
+	networkTimeout              = 10 * time.Second
+	issuanceForBlockMiner       = 2
+	issuanceMakeBlockchainGoing = 1
+	maximumItemName             = 64
 )
 
 type TransitionVerbs struct {
@@ -130,7 +131,8 @@ func registerAsset(owner account.Account) (string, error) {
 func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 	params := bitmark.NewIssuanceParams(
 		assetID,
-		issuanceForBlockMiner,
+		//issuanceForBlockMiner,
+		issuanceMakeBlockchainGoing,
 	)
 	err := params.Sign(issuer)
 	if nil != err {
