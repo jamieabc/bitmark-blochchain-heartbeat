@@ -87,8 +87,7 @@ func TestNextCheckTimeWhenLatestReceiveOverHour(t *testing.T) {
 
 	actual, err := block.DurationToNextCheck(mock, time.Hour)
 	assert.Equal(t, nil, err, "wrong error")
-	assert.Greater(t, 1*time.Minute.Nanoseconds(), actual.Nanoseconds(), "wrong upper bound of check time")
-	assert.Less(t, 0*time.Minute.Nanoseconds(), actual.Nanoseconds(), "wrong lower bound of check time")
+	assert.Equal(t, time.Hour.Nanoseconds(), actual.Nanoseconds(), "wrong next check time")
 }
 
 func TestNextCheckTimeWhenLatestReceiveInFuture(t *testing.T) {

@@ -27,17 +27,12 @@ func DurationToNextCheck(remote node.Remote, targetDuration time.Duration) (time
 	durationOfLatestReceivedToNow := now.Sub(latestReceiveTime)
 	fmt.Printf("now: %s, target duration: %s, latest block receive time: %s\n", now, targetDuration, latestReceiveTime)
 
-	if durationOfLatestReceivedToNow > targetDuration {
-		return minNextDuration, nil
+	// long time w/o issuance
+	if targetDuration < durationOfLatestReceivedToNow {
+		return targetDuration, nil
 	}
 
-	// time difference too small, use a minimum delay
-	diff := targetDuration - durationOfLatestReceivedToNow
-	if diff < minNextDuration {
-		return minNextDuration, nil
-	}
-
-	return diff, nil
+	return targetDuration - durationOfLatestReceivedToNow + minNextDuration, nil
 }
 
 func latestBlockGenerationTime(remote node.Remote) (time.Time, error) {
