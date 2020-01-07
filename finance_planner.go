@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-const (
-	minActionInterval = time.Hour
-)
-
 type FinancePlanner struct {
 	period              time.Duration
 	spendingPerCycle    float64
@@ -20,7 +16,7 @@ func newFinancePlanner(c *Config) *FinancePlanner {
 		period:              convertPeriod2Duration(c.CyclePeriod),
 		spendingPerCycle:    c.SpendingPerCycle,
 		costPerAction:       c.IssueCost,
-		minDurationInterval: minActionInterval,
+		minDurationInterval: convertPeriod2Duration(c.MinSpendingPeriod),
 	}
 	return planner
 }
@@ -44,7 +40,9 @@ func convertPeriod2Duration(period string) time.Duration {
 	case "day":
 		duration = time.Duration(24) * time.Hour
 	case "hour":
-		duration = time.Duration(1) * time.Hour
+		duration = time.Hour
+	case "min":
+		duration = time.Minute
 	default:
 		duration = time.Duration(7*24) * time.Hour
 	}

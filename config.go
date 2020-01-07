@@ -14,14 +14,15 @@ import (
 )
 
 const (
-	fileName              = "sdk.conf"
-	recoveryPhrasesLength = 12
-	defaultIssueCost      = 0.001
-	defaultTransferCost   = 0.002
+	fileName                 = "sdk.conf"
+	recoveryPhrasesLength    = 12
+	defaultIssueCost         = 0.001
+	defaultTransferCost      = 0.002
+	defaultMinSpendingPeriod = "hour"
 )
 
 var (
-	cyclePeriod    = []string{"hour", "day", "week", "month"}
+	cyclePeriod    = []string{"min", "hour", "day", "week", "month"}
 	crypto         = []string{"ltc"}
 	chain          = []string{"livenet", "testnet"}
 	defaultLogging = logger.Configuration{
@@ -37,17 +38,18 @@ var (
 )
 
 type Config struct {
-	CyclePeriod      string                   `gluamapper:"cycle_period" json:"cycle_period"`
-	Crypto           string                   `gluamapper:"crypto" json:"crypto"`
-	SpendingPerCycle float64                  `gluamapper:"spending_per_cycle" json:"spending_per_cycle"`
-	IssueCost        float64                  `gluamapper:"issue_cost" json:"issue_cost"`
-	TransferCost     float64                  `gluamapper:"transfer_cost" json:"transfer_cost"`
-	Chain            sdk.Network              `gluamapper:"chain" json:"chain"`
-	SDKApiToken      string                   `gluamapper:"sdk_api_token" json:"sdk_api_token"`
-	RecoveryPhrases  []string                 `gluamapper:"recovery_phrases" json:"recovery_phrases"`
-	NodeConfig       configuration.NodeConfig `gluamapper:"node" json:"node"`
-	Keys             configuration.Keys       `gluamapper:"keys"`
-	Logging          logger.Configuration     `gluamapper:"logging"`
+	CyclePeriod       string                   `gluamapper:"cycle_period" json:"cycle_period"`
+	Crypto            string                   `gluamapper:"crypto" json:"crypto"`
+	SpendingPerCycle  float64                  `gluamapper:"spending_per_cycle" json:"spending_per_cycle"`
+	MinSpendingPeriod string                   `gluamapper:"min_spending_period"`
+	IssueCost         float64                  `gluamapper:"issue_cost" json:"issue_cost"`
+	TransferCost      float64                  `gluamapper:"transfer_cost" json:"transfer_cost"`
+	Chain             sdk.Network              `gluamapper:"chain" json:"chain"`
+	SDKApiToken       string                   `gluamapper:"sdk_api_token" json:"sdk_api_token"`
+	RecoveryPhrases   []string                 `gluamapper:"recovery_phrases" json:"recovery_phrases"`
+	NodeConfig        configuration.NodeConfig `gluamapper:"node" json:"node"`
+	Keys              configuration.Keys       `gluamapper:"keys"`
+	Logging           logger.Configuration     `gluamapper:"logging"`
 }
 
 func newConfig() (*Config, error) {
@@ -57,14 +59,15 @@ func newConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		CyclePeriod:      "week",
-		Crypto:           "ltc",
-		SpendingPerCycle: 0.01,
-		IssueCost:        defaultIssueCost,
-		TransferCost:     defaultTransferCost,
-		Chain:            "testing",
-		SDKApiToken:      "",
-		Logging:          defaultLogging,
+		CyclePeriod:       "week",
+		Crypto:            "ltc",
+		SpendingPerCycle:  0.01,
+		MinSpendingPeriod: defaultMinSpendingPeriod,
+		IssueCost:         defaultIssueCost,
+		TransferCost:      defaultTransferCost,
+		Chain:             "testing",
+		SDKApiToken:       "",
+		Logging:           defaultLogging,
 	}
 
 	err = config.parse(path)
@@ -90,6 +93,7 @@ func contains(strs []string, str string) bool {
 
 func (c *Config) valid() bool {
 	if !contains(cyclePeriod, c.CyclePeriod) ||
+		!contains(cyclePeriod, c.MinSpendingPeriod) ||
 		!contains(crypto, c.Crypto) ||
 		!contains(chain, string(c.Chain)) {
 		return false

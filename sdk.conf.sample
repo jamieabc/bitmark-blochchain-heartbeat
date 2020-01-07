@@ -3,15 +3,22 @@
 local M = {}
 
 -- time period to spend tokens, valid arguments: month, week, day, hour
-M.cycle_period = "week"
+-- default "week"
+-- M.cycle_period = "week"
 
 -- crypto used to estimate, valid arguments: ltc
-M.crypto = "ltc"
+-- default "ltc"
+-- M.crypto = "ltc"
 
 -- how much LTC to spend in the cycle
 -- to have issuance / 10 minutes, cost a week is 1.008 LTC
 -- to have transfer / 10 minutes, cost a week is 2.016 LTC
+-- default 0.01
 M.spending_per_cycle = 0.01
+
+-- minimum time period to spend tokens, valid arguments: month, week, day, hour, min
+-- default "hour"
+-- M.min_spending_period = "hour"
 
 -- spending cost base on crypto
 M.issue_cost = 0.001
