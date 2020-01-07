@@ -1,4 +1,4 @@
-package main
+package sdk
 
 import (
 	"fmt"
@@ -7,19 +7,21 @@ import (
 	"strings"
 	"time"
 
-	sdk "github.com/bitmark-inc/bitmark-sdk-go"
+	bitmarkSDK "github.com/bitmark-inc/bitmark-sdk-go"
 	"github.com/bitmark-inc/bitmark-sdk-go/account"
 	"github.com/bitmark-inc/bitmark-sdk-go/asset"
 	"github.com/bitmark-inc/bitmark-sdk-go/bitmark"
 	"github.com/bxcodec/faker/v3"
 	"golang.org/x/text/language"
+
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/pkg/parser"
 )
 
 const (
 	networkTimeout              = 10 * time.Second
 	issuanceForBlockMiner       = 2
 	issuanceMakeBlockchainGoing = 1
-	maximumItemName             = 64
+	MaximumItemName             = 64
 )
 
 type TransitionVerbs struct {
@@ -44,17 +46,18 @@ var (
 		{"Bán", ""},
 		{"Của tôi", ""},
 	}
+	books []string
 )
 
-func truncateLongString(str string) string {
-	if len(str) >= maximumItemName {
-		return str[0:maximumItemName]
+func TruncateLongString(str string) string {
+	if len(str) >= MaximumItemName {
+		return str[0:MaximumItemName]
 	}
 	return str
 }
 
 func meaningfulName(item string) string {
-	str := truncateLongString(item)
+	str := TruncateLongString(item)
 	transitionVerb := verbs[rand.Intn(len(verbs))]
 	if "" != transitionVerb.adv {
 		return fmt.Sprintf("%s %s %s %s", transitionVerb.verb, str,
@@ -63,12 +66,14 @@ func meaningfulName(item string) string {
 	return fmt.Sprintf("%s %s", transitionVerb.verb, str)
 }
 
-func newSdkConfig(config *Config) *sdk.Config {
+func NewSDKConfig(config parser.Config, data []string) *bitmarkSDK.Config {
 	httpClient := &http.Client{
 		Timeout: networkTimeout,
 	}
 
-	sdkConfig := &sdk.Config{
+	books = data
+
+	sdkConfig := &bitmarkSDK.Config{
 		APIToken:   config.SDKApiToken,
 		Network:    config.Chain,
 		HTTPClient: httpClient,
@@ -84,7 +89,7 @@ func arrayMap(strs []string, f func(string, string) string) []string {
 	return newStrs
 }
 
-func restoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) {
+func RestoreAccountFromRecoveryPhrase(strs []string) ([]account.Account, error) {
 	var accounts []account.Account
 	for _, s := range strs {
 		phrases := strings.Split(s, ",")
@@ -141,7 +146,7 @@ func issueAsset(issuer account.Account, assetID string) ([]string, error) {
 	return bitmark.Issue(params)
 }
 
-func createIssuanceFromAccountsRandomly(accounts []account.Account) error {
+func CreateIssuanceFromAccountsRandomly(accounts []account.Account) error {
 	issuer := randomPickUser(accounts)
 	fmt.Printf("%v: %s create issuance\n",
 		time.Now(), issuer.AccountNumber())

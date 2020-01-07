@@ -1,8 +1,10 @@
-package main
+package sdk_test
 
 import (
 	"math/rand"
 	"testing"
+
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/pkg/sdk"
 )
 
 var (
@@ -18,18 +20,18 @@ func randomString(length int) string {
 }
 
 func TestTruncateLongString(t *testing.T) {
-	longStr := randomString(2 * maximumItemName)
-	shortStr := randomString(maximumItemName - 1)
+	longStr := randomString(2 * sdk.MaximumItemName)
+	shortStr := randomString(sdk.MaximumItemName - 1)
 	fixture := []struct {
 		str      string
 		expected string
 	}{
-		{longStr, longStr[0:maximumItemName]},
+		{longStr, longStr[0:sdk.MaximumItemName]},
 		{shortStr, shortStr},
 	}
 
 	for i, s := range fixture {
-		actual := truncateLongString(s.str)
+		actual := sdk.TruncateLongString(s.str)
 		if actual != s.expected {
 			t.Errorf("%d testerror truncated string, expected %s but get %s",
 				i,

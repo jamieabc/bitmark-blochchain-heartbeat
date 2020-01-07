@@ -1,7 +1,9 @@
-package main
+package finance_planner
 
 import (
 	"time"
+
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/pkg/parser"
 )
 
 type FinancePlanner struct {
@@ -11,17 +13,17 @@ type FinancePlanner struct {
 	minDurationInterval time.Duration
 }
 
-func newFinancePlanner(c *Config) *FinancePlanner {
+func NewFinancePlanner(c parser.Config) *FinancePlanner {
 	planner := &FinancePlanner{
-		period:              convertPeriod2Duration(c.CyclePeriod),
+		period:              ConvertPeriod2Duration(c.CyclePeriod),
 		spendingPerCycle:    c.SpendingPerCycle,
 		costPerAction:       c.IssueCost,
-		minDurationInterval: convertPeriod2Duration(c.MinSpendingPeriod),
+		minDurationInterval: ConvertPeriod2Duration(c.MinSpendingPeriod),
 	}
 	return planner
 }
 
-func (p *FinancePlanner) actionDuration() time.Duration {
+func (p *FinancePlanner) ActionDuration() time.Duration {
 	actionCount := p.spendingPerCycle / p.costPerAction
 	duration := time.Duration(float64(p.period)/actionCount) * time.Nanosecond
 	if duration < p.minDurationInterval {
@@ -30,7 +32,7 @@ func (p *FinancePlanner) actionDuration() time.Duration {
 	return duration
 }
 
-func convertPeriod2Duration(period string) time.Duration {
+func ConvertPeriod2Duration(period string) time.Duration {
 	var duration time.Duration
 	switch period {
 	case "month":

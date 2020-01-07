@@ -10,13 +10,22 @@ import (
 
 	"github.com/bitmark-inc/logger"
 
-	sdk "github.com/bitmark-inc/bitmark-sdk-go"
+	bitmarkSDK "github.com/bitmark-inc/bitmark-sdk-go"
+	financePlanner "github.com/jamieabc/bitmark-blochchain-heartbeat/internal/finance_planner"
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/internal/periodic"
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/pkg/parser"
+	"github.com/jamieabc/bitmark-blochchain-heartbeat/pkg/sdk"
+)
+
+const (
+	bookFilename   = "books.txt"
+	configFilename = "sdk.conf"
 )
 
 var books []string
 
 func init() {
-	file, err := os.Open("books.txt")
+	file, err := os.Open(bookFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,9 +42,15 @@ func init() {
 }
 
 func main() {
-	config, err := newConfig()
+	p, err := parser.NewParser(configFilename)
 	if nil != err {
-		fmt.Printf("parse config: %s", err.Error())
+		fmt.Printf("new parser with error: %s", err)
+		return
+	}
+
+	config, err := p.Parse()
+	if err != nil {
+		fmt.Printf("parse config with error: %s", err)
 		return
 	}
 
@@ -45,9 +60,9 @@ func main() {
 		return
 	}
 
-	sdk.Init(newSdkConfig(config))
+	bitmarkSDK.Init(sdk.NewSDKConfig(config, books))
 
-	accounts, err := restoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
+	accounts, err := sdk.RestoreAccountFromRecoveryPhrase(config.RecoveryPhrases)
 	if nil != err {
 		fmt.Printf("restore accoutn error: %s", err.Error())
 		return
@@ -55,16 +70,12 @@ func main() {
 
 	fmt.Println("Start heartbeat...")
 
-	fp := newFinancePlanner(config)
-	duration := fp.actionDuration()
+	fp := financePlanner.NewFinancePlanner(config)
+	duration := fp.ActionDuration()
 	fmt.Printf("action duration: %v\n", duration)
 	shutdownChan := make(chan struct{})
-	doPeriodicTasks(taskInfo{
-		duration:     duration,
-		accounts:     accounts,
-		shutdownChan: shutdownChan,
-		config:       config,
-	})
+	per := periodic.NewPeriodic(duration, accounts, shutdownChan, config)
+	per.Do()
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)

@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"fmt"
@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	fileName                 = "sdk.conf"
 	recoveryPhrasesLength    = 12
 	defaultIssueCost         = 0.001
 	defaultTransferCost      = 0.002
@@ -37,6 +36,50 @@ var (
 	}
 )
 
+type Parser interface {
+	Parse() (Config, error)
+}
+
+type parser struct {
+	path string
+}
+
+func NewParser(fileName string) (Parser, error) {
+	path, err := filepath.Abs(filepath.Clean(fileName))
+	if nil != err {
+		return nil, err
+	}
+
+	return &parser{
+		path: path,
+	}, nil
+}
+
+func (p parser) Parse() (Config, error) {
+	config := &Config{
+		CyclePeriod:       "week",
+		Crypto:            "ltc",
+		SpendingPerCycle:  0.01,
+		MinSpendingPeriod: defaultMinSpendingPeriod,
+		IssueCost:         defaultIssueCost,
+		TransferCost:      defaultTransferCost,
+		Chain:             "testing",
+		SDKApiToken:       "",
+		Logging:           defaultLogging,
+	}
+
+	err := config.Parse(p.path)
+	if nil != err {
+		return Config{}, err
+	}
+
+	if !config.valid() {
+		return Config{}, fmt.Errorf("error format %v\n", config)
+	}
+
+	return *config, nil
+}
+
 type Config struct {
 	CyclePeriod       string                   `gluamapper:"cycle_period" json:"cycle_period"`
 	Crypto            string                   `gluamapper:"crypto" json:"crypto"`
@@ -50,36 +93,6 @@ type Config struct {
 	NodeConfig        configuration.NodeConfig `gluamapper:"node" json:"node"`
 	Keys              configuration.Keys       `gluamapper:"keys"`
 	Logging           logger.Configuration     `gluamapper:"logging"`
-}
-
-func newConfig() (*Config, error) {
-	path, err := filepath.Abs(filepath.Clean(fileName))
-	if nil != err {
-		return nil, err
-	}
-
-	config := &Config{
-		CyclePeriod:       "week",
-		Crypto:            "ltc",
-		SpendingPerCycle:  0.01,
-		MinSpendingPeriod: defaultMinSpendingPeriod,
-		IssueCost:         defaultIssueCost,
-		TransferCost:      defaultTransferCost,
-		Chain:             "testing",
-		SDKApiToken:       "",
-		Logging:           defaultLogging,
-	}
-
-	err = config.parse(path)
-	if nil != err {
-		return nil, err
-	}
-
-	if !config.valid() {
-		return nil, fmt.Errorf("error format %v\n", config)
-	}
-
-	return config, nil
 }
 
 func contains(strs []string, str string) bool {
@@ -106,7 +119,7 @@ func (c *Config) valid() bool {
 	return true
 }
 
-func (c *Config) parse(path string) error {
+func (c *Config) Parse(path string) error {
 	L := lua.NewState()
 	defer L.Close()
 
